@@ -1,0 +1,218 @@
+/* ─── Tokens ─────────────────────────────────────────── */
+:root {
+    --bg:          #0a0a0a;
+    --gold:        #c9a84c;
+    --gold-light:  #e8d5a3;
+    --gold-dim:    #7a6330;
+    --white:       #ffffff;
+    --shadow:      rgba(201, 168, 76, 0.18);
+}
+
+/* ─── Reset & Base ───────────────────────────────────── */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg);
+    font-family: 'Montserrat', sans-serif;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ─── Ambient Particles Canvas ───────────────────────── */
+#particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.55;
+}
+
+/* ─── Corner Accents ─────────────────────────────────── */
+.corner {
+    position: fixed;
+    width: 48px;
+    height: 48px;
+    z-index: 1;
+    opacity: 0.6;
+}
+
+.corner--tl { top: 28px; left: 28px;   border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+.corner--tr { top: 28px; right: 28px;  border-top: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+.corner--bl { bottom: 28px; left: 28px;  border-bottom: 1px solid var(--gold); border-left: 1px solid var(--gold); }
+.corner--br { bottom: 28px; right: 28px; border-bottom: 1px solid var(--gold); border-right: 1px solid var(--gold); }
+
+/* ─── Wrapper ─────────────────────────────────────────── */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    position: relative;
+    z-index: 2;
+}
+
+/* ─── Labels ─────────────────────────────────────────── */
+.label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    user-select: none;
+}
+
+.label-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 200;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    opacity: 0.75;
+}
+
+.label-line {
+    display: block;
+    width: 52px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim));
+}
+
+.label--top .label-line:last-child {
+    background: linear-gradient(90deg, var(--gold-dim), transparent);
+}
+
+.label-dot {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.7;
+    animation: pulse-dot 2.8s ease-in-out infinite;
+}
+
+.label-dot:last-child {
+    animation-delay: 1.4s;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50%       { opacity: 0.9;  transform: scale(1.5); }
+}
+
+/* ─── Scene & Flip ───────────────────────────────────── */
+.scene {
+    width: 520px;
+    height: 290px;
+    perspective: 1200px;
+    cursor: pointer;
+    position: relative;
+}
+
+.card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.9s cubic-bezier(0.4, 0.0, 0.2, 1);
+    will-change: transform;
+}
+
+.scene.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+/* ─── Card Faces ─────────────────────────────────────── */
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow:
+        0 0  0   1px rgba(201, 168, 76, 0.15),
+        0 8px 32px rgba(0, 0, 0, 0.7),
+        0 0 64px  rgba(201, 168, 76, 0.06);
+}
+
+.card-face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Hover: warm gold glow */
+.scene:hover .card-face {
+    box-shadow:
+        0 0  0   1px rgba(201, 168, 76, 0.4),
+        0 12px 48px rgba(0, 0, 0, 0.75),
+        0  0  80px  rgba(201, 168, 76, 0.18);
+    transition: box-shadow 0.5s ease;
+}
+
+.back {
+    transform: rotateY(180deg);
+}
+
+/* ─── SVG Shimmer Border ─────────────────────────────── */
+.card-border {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.scene:hover .card-border {
+    opacity: 1;
+}
+
+.border-path {
+    stroke: url(#goldGradient);
+    stroke-width: 1.5;
+    fill: none;
+    stroke-dasharray: 1616;
+    stroke-dashoffset: 1616;
+    animation: none;
+}
+
+.scene:hover .border-path {
+    animation: trace-border 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes trace-border {
+    to { stroke-dashoffset: 0; }
+}
+
+/* Define gradient in SVG via CSS filter hack — done inline in JS */
+
+/* ─── Responsive ─────────────────────────────────────── */
+@media (max-width: 580px) {
+    .scene {
+        width: 90vw;
+        height: calc(90vw * 290 / 520);
+    }
+
+    .label-line { width: 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card-inner { transition: none; }
+    .border-path { animation: none !important; }
+    .label-dot { animation: none; }
+}
